@@ -1,6 +1,7 @@
 package com.shaktipravesh.journalDemoApp.controller;
 
 import com.shaktipravesh.journalDemoApp.entity.JournalEntry;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Map;
 @RequestMapping("/journal")
 public class JournalEntryController {
 
-    private Map<Long, JournalEntry> journalEntries = new HashMap<>();
+    private final Map<Long, JournalEntry> journalEntries = new HashMap<>();
 
     @GetMapping("/entries")
     public List<JournalEntry> getAllJournalEntries() {
@@ -21,6 +22,11 @@ public class JournalEntryController {
 
     @GetMapping("/entrypoint/{myId}")
     public JournalEntry getAllJournalEntryById(@PathVariable Long myId) {
+        return journalEntries.get(myId);
+    }
+
+    @GetMapping("/entrypoint_param/")
+    public JournalEntry getAllJournalEntryByParamId(@RequestParam Long myId ) {
         return journalEntries.get(myId);
     }
 
