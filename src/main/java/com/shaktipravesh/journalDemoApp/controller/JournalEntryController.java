@@ -25,7 +25,7 @@ public class JournalEntryController {
         return journalEntries.get(myId);
     }
 
-    @GetMapping("/entrypoint param/")
+    @GetMapping("/entrypoint_param/")
     public JournalEntry getAllJournalEntryByParamId(@RequestParam Long myId ) {
         return journalEntries.get(myId);
     }
