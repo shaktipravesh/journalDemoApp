@@ -16,7 +16,7 @@ public class JournalEntryMongoDBController {
     @Autowired
     private JournalMongodbEntryService journalMongodbEntryService;
 
-    private final Map<ObjectId, JournalMongoDBEntry> journalEntries = new HashMap<org.bson.types.ObjectId, JournalMongoDBEntry>();
+    private final Map<String, JournalMongoDBEntry> journalEntries = new HashMap<String, JournalMongoDBEntry>();
 
     @GetMapping
     public List<JournalMongoDBEntry> getAll() {

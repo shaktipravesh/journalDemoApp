@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Document
 public class JournalMongoDBEntry {
     @Id
-    private ObjectId id;
+    private String id;
     private String title;
     private String content;
     private LocalDateTime date;
@@ -22,11 +22,11 @@ public class JournalMongoDBEntry {
         this.date = date;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
