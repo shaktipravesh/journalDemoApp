@@ -84,9 +84,14 @@ public class JournalEntryMongoDBController {
     }
 
     @GetMapping("/entrypoint/{myId}")
-    public ResponseEntity<?> getAllJournalEntryById(@PathVariable String myId) {
-        JournalMongoDBEntry entry = journalEntries.get(myId);
-        return new ResponseEntity<>(entry, HttpStatus.OK);
+    public ResponseEntity<?> getAllJournalEntryById(@PathVariable ObjectId myId) {
+        System.out.println("GetAllJournalEntryById called");
+        try {
+            JournalMongoDBEntry entry = journalMongodbEntryService.getEntryById(myId).orElse(null);
+            return new ResponseEntity<>(entry, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/entries")
@@ -100,7 +105,7 @@ public class JournalEntryMongoDBController {
     }
 
     @DeleteMapping("/entrypoint/{myId}")
-    public ResponseEntity<Boolean> deleteEntrybyId(@PathVariable String myId) {
+    public ResponseEntity<Boolean> deleteEntryById(@PathVariable ObjectId myId) {
         try {
             journalEntries.remove(myId);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -110,7 +115,7 @@ public class JournalEntryMongoDBController {
     }
 
     @PutMapping("/entrypoint/{myId}")
-    public ResponseEntity<Boolean> updateEntryById(@RequestBody JournalMongoDBEntry entry) {
+    public ResponseEntity<Boolean> updateEntryById(@RequestBody JournalMongoDBEntry entry, @PathVariable ObjectId myId) {
         try {
             journalEntries.put(entry.getId(), entry);
             return new ResponseEntity<>(true, HttpStatus.ACCEPTED);
