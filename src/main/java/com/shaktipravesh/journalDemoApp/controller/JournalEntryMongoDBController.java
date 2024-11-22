@@ -4,7 +4,10 @@ import com.shaktipravesh.journalDemoApp.entity.JournalMongoDBEntry;
 import com.shaktipravesh.journalDemoApp.service.JournalMongodbEntryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -16,67 +19,108 @@ public class JournalEntryMongoDBController {
     @Autowired
     private JournalMongodbEntryService journalMongodbEntryService;
 
-    private final Map<String, JournalMongoDBEntry> journalEntries = new HashMap<String, JournalMongoDBEntry>();
+    private final Map<ObjectId, JournalMongoDBEntry> journalEntries = new HashMap<>();
 
     @GetMapping
-    public List<JournalMongoDBEntry> getAll() {
-        return journalMongodbEntryService.getAllEntries();
+    public ResponseEntity<?> getAll() {
+        try {
+            List<JournalMongoDBEntry> all = journalMongodbEntryService.getAllEntries();
+            return new ResponseEntity<>(all, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping
-    public JournalMongoDBEntry createMongoDBEntry(@RequestBody JournalMongoDBEntry entry) {
-        entry.setDate(LocalDateTime.now());
-        journalMongodbEntryService.saveEntry(entry);
-        return entry;
+    public ResponseEntity<JournalMongoDBEntry> createMongoDBEntry(@RequestBody JournalMongoDBEntry entry) {
+        try {
+            entry.setDate(LocalDateTime.now());
+            journalMongodbEntryService.saveEntry(entry);
+            return new ResponseEntity<>(entry, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("id/{myId}")
-    public JournalMongoDBEntry getMongoDBEntryById(@PathVariable ObjectId myId) {
-        return journalMongodbEntryService.getEntryById(myId).orElse(null);
+    public ResponseEntity<JournalMongoDBEntry> getMongoDBEntryById(@PathVariable ObjectId myId) {
+        Optional<JournalMongoDBEntry> entry = journalMongodbEntryService.getEntryById(myId);
+        return entry.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("id/{myId}")
-    public boolean deleteMongoDBEntry(@PathVariable ObjectId myId) {
-        journalMongodbEntryService.deleteEntryById(myId);
-        return true;
+    public ResponseEntity<?> deleteMongoDBEntry(@PathVariable ObjectId myId) {
+        try {
+            journalMongodbEntryService.deleteEntryById(myId);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @PutMapping({"id/{myId}"})
-    public JournalMongoDBEntry updateMongoDBEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
-        JournalMongoDBEntry oldEntry = journalMongodbEntryService.getEntryById(myId).orElse(null);
-        if(oldEntry != null) {
-            oldEntry.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().isEmpty() ? newEntry.getTitle() : oldEntry.getTitle());
-            oldEntry.setContent(newEntry.getContent() != null && !newEntry.getContent().isEmpty() ? newEntry.getContent() : oldEntry.getContent());
+    public ResponseEntity<?> updateMongoDBEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
+        try {
+            JournalMongoDBEntry oldEntry = journalMongodbEntryService.getEntryById(myId).orElse(null);
+            if(oldEntry != null) {
+                oldEntry.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().isEmpty() ? newEntry.getTitle() : oldEntry.getTitle());
+                oldEntry.setContent(newEntry.getContent() != null && !newEntry.getContent().isEmpty() ? newEntry.getContent() : oldEntry.getContent());
+            }
+            journalMongodbEntryService.saveEntry(oldEntry);
+            return new ResponseEntity<>(oldEntry, HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        journalMongodbEntryService.saveEntry(oldEntry);
-        return newEntry;
     }
 
     @GetMapping("/entries")
-    public List<JournalMongoDBEntry> getAllJournalEntries() {
-        return new ArrayList<>(journalEntries.values());
+    public ResponseEntity<?> getAllJournalEntries() {
+        try {
+            List<JournalMongoDBEntry> all = new ArrayList<>(journalEntries.values());
+            return new ResponseEntity<>(all, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/entrypoint/{myId}")
-    public JournalMongoDBEntry getAllJournalEntryById(@PathVariable String myId) {
-        return journalEntries.get(myId);
+    public ResponseEntity<?> getAllJournalEntryById(@PathVariable ObjectId myId) {
+        System.out.println("GetAllJournalEntryById called");
+        try {
+            JournalMongoDBEntry entry = journalMongodbEntryService.getEntryById(myId).orElse(null);
+            return new ResponseEntity<>(entry, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/entries")
-    public boolean createEntry(@RequestBody JournalMongoDBEntry entry) {
-        journalEntries.put(entry.getId(), entry);
-        return true;
+    public ResponseEntity<Boolean> createEntry(@RequestBody JournalMongoDBEntry entry) {
+        try {
+            journalEntries.put(entry.getId(), entry);
+            return new ResponseEntity<>(true, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/entrypoint/{myId}")
-    public boolean deleteEntrybyId(@PathVariable String myId) {
-        journalEntries.remove(myId);
-        return true;
+    public ResponseEntity<Boolean> deleteEntryById(@PathVariable ObjectId myId) {
+        try {
+            journalEntries.remove(myId);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
     @PutMapping("/entrypoint/{myId}")
-    public boolean updateEntryById(@RequestBody JournalMongoDBEntry entry) {
-        journalEntries.put(entry.getId(), entry);
-        return true;
+    public ResponseEntity<Boolean> updateEntryById(@RequestBody JournalMongoDBEntry entry, @PathVariable ObjectId myId) {
+        try {
+            journalEntries.put(myId, entry);
+            return new ResponseEntity<>(true, HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
