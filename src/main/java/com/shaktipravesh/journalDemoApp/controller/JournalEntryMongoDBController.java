@@ -19,7 +19,7 @@ public class JournalEntryMongoDBController {
     @Autowired
     private JournalMongodbEntryService journalMongodbEntryService;
 
-    private final Map<ObjectId, JournalMongoDBEntry> journalEntries = new HashMap<org.bson.types.ObjectId, JournalMongoDBEntry>();
+    private final Map<ObjectId, JournalMongoDBEntry> journalEntries = new HashMap<>();
 
     @GetMapping
     public ResponseEntity<?> getAll() {
@@ -59,7 +59,7 @@ public class JournalEntryMongoDBController {
     }
 
     @PutMapping({"id/{myId}"})
-    public ResponseEntity<JournalMongoDBEntry> updateMongoDBEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
+    public ResponseEntity<?> updateMongoDBEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
         try {
             JournalMongoDBEntry oldEntry = journalMongodbEntryService.getEntryById(myId).orElse(null);
             if(oldEntry != null) {
@@ -69,7 +69,7 @@ public class JournalEntryMongoDBController {
             journalMongodbEntryService.saveEntry(oldEntry);
             return new ResponseEntity<>(oldEntry, HttpStatus.ACCEPTED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -117,7 +117,7 @@ public class JournalEntryMongoDBController {
     @PutMapping("/entrypoint/{myId}")
     public ResponseEntity<Boolean> updateEntryById(@RequestBody JournalMongoDBEntry entry, @PathVariable ObjectId myId) {
         try {
-            journalEntries.put(entry.getId(), entry);
+            journalEntries.put(myId, entry);
             return new ResponseEntity<>(true, HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
