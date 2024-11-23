@@ -1,21 +1,19 @@
 package com.shaktipravesh.journalDemoApp.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
 @Document(collection = "mongoDBEntry")
-@Getter
-@Setter
-@ToString
+@Data
 public class JournalMongoDBEntry {
     @Id
     private ObjectId id;
+    @NonNull
     private String title;
     private String content;
     private LocalDateTime date;
