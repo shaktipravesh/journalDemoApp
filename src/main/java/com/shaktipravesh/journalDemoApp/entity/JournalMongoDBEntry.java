@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Document(collection = "mongoDBEntry")
 @Data
+@NoArgsConstructor
 public class JournalMongoDBEntry {
     @Id
     private ObjectId id;
