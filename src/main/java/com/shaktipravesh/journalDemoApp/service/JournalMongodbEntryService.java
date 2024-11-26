@@ -23,12 +23,15 @@ public class JournalMongodbEntryService {
     }
 
     public void saveEntry(JournalMongoDBEntry entry, String userName) {
-        User user = usersService.getUserByUserName(userName);
-        entry.setDate(LocalDateTime.now());
-        JournalMongoDBEntry saved = journalEntryRepository.save(entry);
-
-        user.getEntries().add(saved);
-        usersService.saveEntry(user);
+        try {
+            User user = usersService.getUserByUserName(userName);
+            entry.setDate(LocalDateTime.now());
+            JournalMongoDBEntry saved = journalEntryRepository.save(entry);
+            user.getEntries().add(saved);
+            usersService.saveEntry(user);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<JournalMongoDBEntry> getAllEntries() {
@@ -44,10 +47,14 @@ public class JournalMongodbEntryService {
     }
 
     public void deleteEntryById(ObjectId id, String userName) {
-        User user = usersService.getUserByUserName(userName);
-        user.getEntries().removeIf(entry -> entry.getId().equals(id));
-        usersService.saveEntry(user);
-        journalEntryRepository.deleteById(id);
+        try {
+            User user = usersService.getUserByUserName(userName);
+            user.getEntries().removeIf(entry -> entry.getId().equals(id));
+            usersService.saveEntry(user);
+            journalEntryRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
