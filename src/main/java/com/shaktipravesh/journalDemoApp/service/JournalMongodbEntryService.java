@@ -6,6 +6,7 @@ import com.shaktipravesh.journalDemoApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,13 +23,16 @@ public class JournalMongodbEntryService {
         journalEntryRepository.save(entry);
     }
 
+    @Transactional
     public void saveEntry(JournalMongoDBEntry entry, String userName) {
         try {
             User user = usersService.getUserByUserName(userName);
-            entry.setDate(LocalDateTime.now());
-            JournalMongoDBEntry saved = journalEntryRepository.save(entry);
-            user.getEntries().add(saved);
-            usersService.saveEntry(user);
+            if(user != null) {
+                entry.setDate(LocalDateTime.now());
+                JournalMongoDBEntry saved = journalEntryRepository.save(entry);
+                user.getEntries().add(saved);
+                usersService.saveEntry(user);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -46,17 +50,16 @@ public class JournalMongodbEntryService {
         journalEntryRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteEntryById(ObjectId id, String userName) {
         try {
             User user = usersService.getUserByUserName(userName);
-            user.getEntries().removeIf(entry -> entry.getId().equals(id));
-            usersService.saveEntry(user);
-            journalEntryRepository.deleteById(id);
+            if(user.getEntries().removeIf(entry -> entry.getId().equals(id))) {
+                usersService.saveEntry(user);
+                journalEntryRepository.deleteById(id);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 }
-
-
-//controller --> service --> repository
