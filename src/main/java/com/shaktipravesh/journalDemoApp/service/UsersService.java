@@ -19,8 +19,12 @@ public class UsersService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
-    public void saveEntry(User user) {
+    public void saveNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        usersRepository.save(user);
+    }
+
+    public void updateUserJournalEntries(User user) {
         usersRepository.save(user);
     }
 

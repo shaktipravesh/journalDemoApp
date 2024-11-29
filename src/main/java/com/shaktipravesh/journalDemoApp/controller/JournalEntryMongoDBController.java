@@ -8,6 +8,8 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,11 +38,13 @@ public class JournalEntryMongoDBController {
         }
     }
 
-    @GetMapping("{userName}")
-    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String userName) {
-        System.out.println("getAllJournalEntriesOfUser called");
+    @GetMapping("/user")
+    public ResponseEntity<?> getAllJournalEntriesOfUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authUserName = authentication.getName();
+
         try {
-            User user = usersService.getUserByUserName(userName);
+            User user = usersService.getUserByUserName(authUserName);
             List<JournalMongoDBEntry> all = user.getEntries();//journalMongodbEntryService.getAllEntries();
             return new ResponseEntity<>(all, HttpStatus.OK);
         } catch (Exception e) {
@@ -48,13 +52,13 @@ public class JournalEntryMongoDBController {
         }
     }
 
-    @PostMapping("{userName}")
-    public ResponseEntity<JournalMongoDBEntry> createMongoDBEntry(@RequestBody JournalMongoDBEntry entry, @PathVariable String userName) {
+    @PostMapping()
+    public ResponseEntity<JournalMongoDBEntry> createMongoDBEntry(@RequestBody JournalMongoDBEntry entry) {
         System.out.println("createMongoDBEntry called");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authUserName = authentication.getName();
         try {
-            //entry.setDate(LocalDateTime.now());
-            //journalMongodbEntryService.saveEntry(entry);
-            journalMongodbEntryService.saveEntry(entry, userName);
+            journalMongodbEntryService.saveEntry(entry, authUserName);
             return new ResponseEntity<>(entry, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -62,25 +66,29 @@ public class JournalEntryMongoDBController {
     }
 
     @GetMapping("id/{myId}")
-    public ResponseEntity<JournalMongoDBEntry> getMongoDBEntryById(@PathVariable ObjectId myId) {
-        Optional<JournalMongoDBEntry> entry = journalMongodbEntryService.getEntryById(myId);
-        return entry.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> getMongoDBEntryById(@PathVariable ObjectId myId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String authUserName = authentication.getName();
+            User user = usersService.getUserByUserName(authUserName);
+            List<JournalMongoDBEntry> allEntries = user.getEntries().stream().filter(x -> x.getId().equals(myId)).toList();
+            if(!allEntries.isEmpty()) {
+                Optional<JournalMongoDBEntry> entry = journalMongodbEntryService.getEntryById(myId);
+                return entry.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+            } else {
+                return new ResponseEntity<>("Not Authorised for this id", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("id/{myId}")
     public ResponseEntity<?> deleteMongoDBEntry(@PathVariable ObjectId myId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authUserName = authentication.getName();
         try {
-            journalMongodbEntryService.deleteEntryById(myId);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-
-    @DeleteMapping("id/{userName}/{myId}")
-    public ResponseEntity<?> deleteMongoDBEntry(@PathVariable ObjectId myId, @PathVariable String userName) {
-        try {
-            journalMongodbEntryService.deleteEntryById(myId, userName);
+            journalMongodbEntryService.deleteEntryById(myId, authUserName);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -88,13 +96,10 @@ public class JournalEntryMongoDBController {
     }
 
     @PutMapping({"id/{myId}"})
-    public ResponseEntity<?> updateMongoDBEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
-        return getResponseEntity(myId, newEntry);
-    }
-
-    @PutMapping({"id/{userName}/{myId}"})
-    public ResponseEntity<?> updateMongoDBUserNameEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry, @PathVariable String userName) {
-        User user = usersService.getUserByUserName(userName);
+    public ResponseEntity<?> updateMongoDBUserNameEntry(@PathVariable ObjectId myId, @RequestBody JournalMongoDBEntry newEntry) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authUserName = authentication.getName();
+        User user = usersService.getUserByUserName(authUserName);
         List<JournalMongoDBEntry> entries = user.getEntries();
         for (JournalMongoDBEntry entry : entries) {
             if(entry.getId().equals(myId)) {
