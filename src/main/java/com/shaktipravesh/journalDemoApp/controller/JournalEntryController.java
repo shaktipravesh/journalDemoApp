@@ -1,7 +1,6 @@
 package com.shaktipravesh.journalDemoApp.controller;
 
 import com.shaktipravesh.journalDemoApp.entity.JournalEntry;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;

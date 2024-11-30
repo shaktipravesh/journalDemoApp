@@ -25,4 +25,5 @@ public class User {
 
     @DBRef
     private List<JournalMongoDBEntry> entries = new ArrayList<>();
+    private List<String> roles = new ArrayList<>();
 }

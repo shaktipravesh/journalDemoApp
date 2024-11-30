@@ -31,7 +31,7 @@ public class JournalMongodbEntryService {
                 entry.setDate(LocalDateTime.now());
                 JournalMongoDBEntry saved = journalEntryRepository.save(entry);
                 user.getEntries().add(saved);
-                usersService.saveEntry(user);
+                usersService.updateUserJournalEntries(user);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -46,17 +46,15 @@ public class JournalMongodbEntryService {
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteEntryById(ObjectId id) {
-        journalEntryRepository.deleteById(id);
-    }
-
     @Transactional
     public void deleteEntryById(ObjectId id, String userName) {
         try {
             User user = usersService.getUserByUserName(userName);
             if(user.getEntries().removeIf(entry -> entry.getId().equals(id))) {
-                usersService.saveEntry(user);
+                usersService.updateUserJournalEntries(user);
                 journalEntryRepository.deleteById(id);
+            } else {
+                throw new RuntimeException("Entries does not exist for the user");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
