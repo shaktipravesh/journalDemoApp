@@ -19,9 +19,14 @@ public class UsersService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
-    public void saveNewUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        usersRepository.save(user);
+    public boolean saveNewUser(User user) {
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            usersRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void updateUserJournalEntries(User user) {
@@ -36,11 +41,17 @@ public class UsersService {
         return usersRepository.findById(id);
     }
 
-    public void deleteUserById(ObjectId id) {
-        usersRepository.deleteById(id);
+    public boolean deleteUserById(ObjectId id) {
+        try {
+            usersRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public User getUserByUserName(String username) {
         return usersRepository.findByUserName(username);
     }
+
 }
