@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: journalDemoApp
+  data:
+    mongodb:
+      uri: mongodb+srv://shaktipravesh:Spravesh@cluster0.q9rww.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: journaldb
+      auto-index-creation: true
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+
+server:
+  port: 8082
+  servlet:
+    context-path: /journal
