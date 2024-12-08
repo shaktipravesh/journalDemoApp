@@ -4,6 +4,8 @@ import com.shaktipravesh.journalDemoApp.entity.JournalMongoDBEntry;
 import com.shaktipravesh.journalDemoApp.entity.User;
 import com.shaktipravesh.journalDemoApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ public class JournalMongodbEntryService {
     private JournalEntryRepository journalEntryRepository;
     @Autowired
     UsersService usersService;
+
+    Logger logger = LoggerFactory.getLogger(JournalMongodbEntryService.class);
 
     public void saveEntry(JournalMongoDBEntry entry) {
         journalEntryRepository.save(entry);
@@ -34,6 +38,7 @@ public class JournalMongodbEntryService {
                 usersService.updateUserJournalEntries(user);
             }
         } catch (Exception e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
