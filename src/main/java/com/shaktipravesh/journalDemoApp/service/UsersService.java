@@ -4,21 +4,23 @@ import com.shaktipravesh.journalDemoApp.entity.User;
 import com.shaktipravesh.journalDemoApp.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 @Slf4j
 public class UsersService {
-    @Autowired
-    private UserRepository usersRepository;
+    private final UserRepository usersRepository;
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public UsersService(UserRepository usersRepository) {
+        this.usersRepository = usersRepository;
+    }
 
     public boolean saveNewUser(User user) {
         try {
