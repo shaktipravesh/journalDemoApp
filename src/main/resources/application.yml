@@ -9,3 +9,6 @@ logging:
       shaktipravesh:
         journalDemoApp: DEBUG
 
+weather:
+  api:
+    key: fafaa4355f160b9ea6f0a31aee2a0f36
