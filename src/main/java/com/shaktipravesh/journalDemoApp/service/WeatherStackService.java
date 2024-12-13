@@ -17,8 +17,7 @@ public class WeatherStackService {
     @Value("${weather.api.key}")
     public String apiKey;
 
-    public String API_KEY;
-    public String API_URL;
+
 
     final
     AppCache appCache;
@@ -35,15 +34,17 @@ public class WeatherStackService {
     }
 
     public WeatherResponse getWeather(String city) {
-        API_KEY = appCache.appCache.get("weather_key");
-        API_URL = appCache.appCache.get("weather_api");
+        String apiKey;
+        String apiUrl;
+        apiKey = appCache.appCache.get("weather_key");
+        apiUrl = appCache.appCache.get("weather_api");
 
-        log.info("apiKey: {}", apiKey);
-        log.info("apiUrl: {}", apiUrl);
-        log.info("API_KEY: {}", API_KEY);
-        log.info("API_URL: {}", API_URL);
+        log.info("this.apiKey: {}", this.apiKey);
+        log.info("this.apiUrl: {}", WeatherStackService.apiUrl);
+        log.info("API_KEY: {}", apiKey);
+        log.info("API_URL: {}", apiUrl);
 
-        String finalAPI = API_URL + "access_key=" + API_KEY + "&query=" + city;
+        String finalAPI = apiUrl + "access_key=" + apiKey + "&query=" + city;
 
         return restTemplate.exchange(finalAPI, HttpMethod.GET, null, WeatherResponse.class).getBody();
     }

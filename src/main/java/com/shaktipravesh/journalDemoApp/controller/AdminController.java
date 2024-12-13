@@ -1,5 +1,6 @@
 package com.shaktipravesh.journalDemoApp.controller;
 
+import com.shaktipravesh.journalDemoApp.cache.AppCache;
 import com.shaktipravesh.journalDemoApp.entity.User;
 import com.shaktipravesh.journalDemoApp.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import java.util.List;
 public class AdminController {
     @Autowired
     private UsersService usersService;
+
+    @Autowired
+    private AppCache appCache;
 
     @RequestMapping("/all-users")
     public ResponseEntity<?> getAllUsers() {
@@ -33,6 +37,16 @@ public class AdminController {
             user.setRoles(roles);
             usersService.saveNewUser(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("reload-app-cache")
+    public ResponseEntity<?> getAppCache() {
+        try {
+            appCache.init();
+            return new ResponseEntity<>(appCache, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -14,10 +14,9 @@ import java.util.Map;
 @Component
 public class AppCache {
 
-    final
-    ConfigJournalAppRepository configJournalAppRepository;
+    final ConfigJournalAppRepository configJournalAppRepository;
 
-    public Map<String, String> appCache = new HashMap<>();
+    public Map<String, String> appCache;
 
     public AppCache(ConfigJournalAppRepository configJournalAppRepository) {
         this.configJournalAppRepository = configJournalAppRepository;
@@ -25,6 +24,7 @@ public class AppCache {
 
     @PostConstruct
     public void init() {
+        appCache = new HashMap<>();
         List<ConfigJournalAppEntity> all  = configJournalAppRepository.findAll();
         for (ConfigJournalAppEntity app : all) {
             appCache.put(app.getKey(), app.getValue());
