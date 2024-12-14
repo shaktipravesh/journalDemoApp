@@ -11,10 +11,8 @@ public class UserRepositoryImplTests {
     @Autowired
     UserRepositoryImpl userRepository;
 
-
     @Test
     void testGetUserForSentimentAnalysis() {
         Assertions.assertNotNull(userRepository.getUserForSentimentAnalysis());
-
     }
 }
