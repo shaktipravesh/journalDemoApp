@@ -9,6 +9,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
+  jpa:
+    show-sql: true
+
+
 
 server:
   port: 8080
