@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 public class SentimentAnalysisService {
 
     public String getSentiment(String text) {
-        return "";
+        if(text == null ||text.isEmpty()) {
+            return "No Sentiment";
+        }
+        return "Sentiment Analysis";
     }
 
 }
