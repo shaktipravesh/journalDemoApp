@@ -37,20 +37,19 @@ public class UserScheduler {
         this.appCache = appCache;
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * Sun")
     public void fetchUserNSendSAEmail() {
-        log.info("fetchUserNSendSAEmail is called");
         List<User> users = userRepository.getUserForSentimentAnalysis();
         for (User user : users) {
             List<JournalMongoDBEntry> journalMongoDBEntries = user.getEntries();
-            List<JournalMongoDBEntry> journalMongoDBEntryList =  journalMongoDBEntries.stream().filter(x->x.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))).collect(Collectors.toList());
+            List<JournalMongoDBEntry> journalMongoDBEntryList =  journalMongoDBEntries.stream().filter(x->x.getDate().isAfter(LocalDateTime.now().minusDays(7))).toList();
             String entry = journalMongoDBEntryList.toString();
             String sentiment = sentimentAnalysisService.getSentiment(entry);
             emailService.sendEmail(user.getEmail(), "Sentiment for last 7 days", sentiment);
         }
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 */6 * * *")
     public void clearAppCache() {
         log.info("Clearing app cache");
         appCache.init();
