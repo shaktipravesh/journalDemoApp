@@ -1,7 +1,20 @@
 spring:
   profiles:
-    active: stg
-
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: spravesh@gmail.com
+    password: vwbu sgfa hbsz qeps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:

@@ -1,5 +1,6 @@
 package com.shaktipravesh.journalDemoApp.entity;
 
+import com.shaktipravesh.journalDemoApp.enums.Sentiment;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -18,4 +19,5 @@ public class JournalMongoDBEntry {
     private String title;
     private String content;
     private LocalDateTime date;
+    private Sentiment sentimentAnalysis;
 }
