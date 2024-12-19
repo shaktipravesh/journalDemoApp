@@ -26,6 +26,9 @@ public class WeatherStackService {
 
     private final RestTemplate restTemplate;
 
+    @Autowired
+    RedisService redisService;
+
 
     @Autowired
     public WeatherStackService(RestTemplateBuilder builder, AppCache appCache) {
@@ -34,10 +37,12 @@ public class WeatherStackService {
     }
 
     public WeatherResponse getWeather(String city) {
-        String apiKey;
-        String apiUrl;
-        apiKey = appCache.appCache.get("weather_key");
-        apiUrl = appCache.appCache.get("weather_api");
+        WeatherResponse weatherResponse = redisService.get("weather_of_" +city, WeatherResponse.class);
+        if(weatherResponse != null) {
+            return weatherResponse;
+        }
+        String apiKey = appCache.appCache.get("weather_key");
+        String apiUrl = appCache.appCache.get("weather_api");
 
         log.info("this.apiKey: {}", this.apiKey);
         log.info("this.apiUrl: {}", WeatherStackService.apiUrl);
@@ -45,7 +50,8 @@ public class WeatherStackService {
         log.info("API_URL: {}", apiUrl);
 
         String finalAPI = apiUrl + "access_key=" + apiKey + "&query=" + city;
-
+        weatherResponse = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WeatherResponse.class).getBody();
+        redisService.set("weather_of_" +city, weatherResponse, 300L);
         return restTemplate.exchange(finalAPI, HttpMethod.GET, null, WeatherResponse.class).getBody();
     }
 }
