@@ -19,8 +19,5 @@ public class RedisTests {
         redisTemplate.opsForValue().set("email", "shaktipravesh@yahoo.co.in");
         String email = (String) redisTemplate.opsForValue().get("email");
         Assertions.assertEquals("shaktipravesh@yahoo.co.in", email);
-        String name = String.valueOf(redisTemplate.opsForValue().get("name"));
-        System.out.println(name);
-        System.out.println(email);
     }
 }

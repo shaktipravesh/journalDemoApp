@@ -70,9 +70,9 @@ public class UserController {
     @GetMapping("/weather")
     public ResponseEntity<String> getWeatherStack() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        WeatherResponse weatherResponse = weatherStackService.getWeather("New Delhi");
+        WeatherResponse weatherResponse = weatherStackService.getWeather("Mumbai");
         if(weatherResponse != null) {
-            String result = "Hello " + authentication.getName() + "!\\n" + "Weather feels like " + weatherResponse.toString();
+            String result = "Hello " + authentication.getName() + "!\\n" + "Weather feels like " + weatherResponse;
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         return new ResponseEntity<>("Hello " + authentication.getName(), HttpStatus.OK);
