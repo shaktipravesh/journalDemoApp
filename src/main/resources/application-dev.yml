@@ -3,18 +3,14 @@ spring:
     name: journalDemoApp
   data:
     mongodb:
-      uri: mongodb+srv://shaktipravesh:Spravesh@cluster0.q9rww.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://xxxxxx:xxxxxx@cluster0.q9rww.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: journaldb
       auto-index-creation: true
     redis:
-      host: redis-13896.c301.ap-south-1-1.ec2.redns.redis-cloud.com
-      port: 13896
-      password: mrhOZ7TsCN7vGsbe5PTVJjSzq2sCjmRa
+      host: redis-31231.c305.ap-ffrrr-1-1.ec2.redns.redis-cloud.com
+      port: 31231
+      password: xxxxxx
 
-
-  #    redis:
-#      host: localhost
-#      port: 6379
 
   main:
     allow-bean-definition-overriding: true
