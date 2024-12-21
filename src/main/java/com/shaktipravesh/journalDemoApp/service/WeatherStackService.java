@@ -26,19 +26,19 @@ public class WeatherStackService {
 
     private final RestTemplate restTemplate;
 
-    @Autowired
     RedisService redisService;
 
-
     @Autowired
-    public WeatherStackService(RestTemplateBuilder builder, AppCache appCache) {
+    public WeatherStackService(RestTemplateBuilder builder, AppCache appCache, RedisService redisService) {
         this.restTemplate = builder.build();
         this.appCache = appCache;
+        this.redisService = redisService;
     }
 
     public WeatherResponse getWeather(String city) {
         WeatherResponse weatherResponse = redisService.get("weather_of_" +city, WeatherResponse.class);
         if(weatherResponse != null) {
+            log.info("Redis Key response: {}", weatherResponse);
             return weatherResponse;
         }
         String apiKey = appCache.appCache.get("weather_key");
