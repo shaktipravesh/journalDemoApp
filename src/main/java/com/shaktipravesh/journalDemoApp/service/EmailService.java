@@ -16,11 +16,11 @@ public class EmailService {
 
     public boolean sendEmail(String to, String subject, String body) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(body);
-            javaMailSender.send(message);
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setTo(to);
+            simpleMailMessage.setSubject(subject);
+            simpleMailMessage.setText(body);
+            javaMailSender.send(simpleMailMessage);
             return true;
 
         } catch (Exception ex) {
